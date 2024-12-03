@@ -4,17 +4,17 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0.93"
-async-std = "1.13.0"
-async-stream = "0.3.6"
-rand = { version = "0.8.5" }
-tokio = "1.42.0"
-tokio-stream = "0.1.16"
-tonic = "0.12.3"
-tracing = "0.1.41"
-tonic-build = "0.12.3"
-prost = "0.13.3"
-prost-types = "0.13.3"
+anyhow = "^1.0"
+async-std = "^1.13"
+async-stream = "^0.3"
+rand = "^0.8.5"
+tokio = "^1.42.0"
+tokio-stream = "^0.1"
+tonic = "^0.12"
+tracing = "^0.1"
+tonic-build = "^0.12"
+prost = "^0.13"
+prost-types = "^0.13"
 
 [build-dependencies]
 miette = { version = "7.2.0", features = ["fancy"] }
