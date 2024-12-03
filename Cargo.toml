@@ -1,5 +1,5 @@
 [package]
-name = "grpc_worker"
+name = "grpc-worker"
 version = "0.1.0"
 edition = "2021"
 
