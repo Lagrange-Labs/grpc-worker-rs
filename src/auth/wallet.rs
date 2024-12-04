@@ -1,4 +1,5 @@
-use anyhow::Context;
+use anyhow::{bail, Context};
+use redact::Secret;
 use std::path::Path;
 use std::str::FromStr;
 
@@ -14,6 +15,20 @@ pub enum WalletBackend {
 }
 
 impl WalletBackend {
+    pub fn from_triplet(
+        keystore_path: Option<String>,
+        keystore_pwd: Option<Secret<String>>,
+        private_key: Option<Secret<String>>,
+    ) -> anyhow::Result<Self> {
+        match (keystore_path, keystore_pwd, private_key) {
+            (Some(keystore_path), Some(password), None) => Ok(WalletBackend::Keystore {
+                keystore_path: keystore_path.clone(),
+                pwd: password.clone(),
+            }),
+            (Some(_), None, Some(pkey)) => Ok(WalletBackend::PrivateKey(pkey.clone())),
+            _ => bail!("Must specify either keystore path w/ password OR private key"),
+        }
+    }
     pub fn get_wallet(&self) -> anyhow::Result<Wallet<SigningKey>> {
         match self {
             WalletBackend::PrivateKey(key) => Wallet::from_str(key.expose_secret())
