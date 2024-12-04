@@ -6,6 +6,7 @@ use std::str::FromStr;
 use ethers::signers::Wallet;
 use k256::ecdsa::SigningKey;
 
+/// Different ways to instantiate a wallet necessary to perform the JWT auth with the Gateway.
 pub enum WalletBackend {
     PrivateKey(redact::Secret<String>),
     Keystore {
