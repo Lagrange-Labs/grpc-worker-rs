@@ -15,6 +15,20 @@ tracing = "^0.1"
 tonic-build = "^0.12"
 prost = "^0.13"
 prost-types = "^0.13"
+hex = "0.4.3"
+serde = "1.0.215"
+serde_json = "1.0.133"
+base64 = "0.22.1"
+elliptic-curve = "0.13.8"
+ethers-core = "2.0.14"
+## TODO: fix by upgrading version and move to alloy
+generic-array = "^0.14"
+jwt = "0.16.0"
+ethers = { git = "https://github.com/Lagrange-Labs/ethers-rs", default-features = false, features = [
+  "rustls",
+], branch = "get-proof-0x" }
+redact = "0.1.10"
+k256 = { version = "0.13", default-features = false }
 
 [build-dependencies]
 miette = { version = "7.2.0", features = ["fancy"] }
