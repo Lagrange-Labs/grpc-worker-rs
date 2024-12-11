@@ -26,7 +26,7 @@ impl WalletBackend {
                 keystore_path: keystore_path.clone(),
                 pwd: password.clone(),
             }),
-            (Some(_), None, Some(pkey)) => Ok(WalletBackend::PrivateKey(pkey.clone())),
+            (None, None, Some(pkey)) => Ok(WalletBackend::PrivateKey(pkey.clone())),
             _ => bail!("Must specify either keystore path w/ password OR private key"),
         }
     }
