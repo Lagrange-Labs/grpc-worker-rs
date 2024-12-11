@@ -124,7 +124,7 @@ impl JWTAuth {
 /// token, and not the GW.
 /// This is due to historical reason where gateway was focused on AVS only workers.
 /// TODO: change that to have the Gateway issuing the JWT token.
-pub fn get_claims(issuer: String, worker_id: String, class: String) -> anyhow::Result<Claims> {
+pub fn get_claims(issuer: String, gw_version: String, worker_id: String, class: String) -> anyhow::Result<Claims> {
     let registered = RegisteredClaims {
         issuer: Some(issuer),
         subject: Some(worker_id),
@@ -137,11 +137,10 @@ pub fn get_claims(issuer: String, worker_id: String, class: String) -> anyhow::R
         ..Default::default()
     };
 
-    let version = env!("CARGO_PKG_VERSION");
     let private = [
         (
             "version".to_string(),
-            serde_json::Value::String(version.to_string()),
+            serde_json::Value::String(gw_version),
         ),
         ("worker_class".to_string(), serde_json::Value::String(class)),
     ]
