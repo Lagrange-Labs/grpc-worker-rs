@@ -6,6 +6,7 @@ use tokio::sync::mpsc;
 use tokio_stream::StreamExt;
 use tonic::Request;
 use tonic::metadata::MetadataValue;
+use tonic::transport::ClientTlsConfig;
 use tracing::error;
 use tracing::info;
 
@@ -48,7 +49,10 @@ impl GrpcConfig {
         let (from_logic_tx, mut from_logic_rx) = tokio::sync::mpsc::channel(1);
         let uri = self.gateway.parse::<tonic::transport::Uri>()?;
         info!("Connecting to Gateway at uri `{uri}`");
-        let channel = tonic::transport::Channel::builder(uri).connect().await?;
+        rustls::crypto::ring::default_provider()
+            .install_default()
+            .expect("Failed to install rustls crypto provider");
+        let channel = tonic::transport::Channel::builder(uri).tls_config(ClientTlsConfig::new().with_enabled_roots())?.connect().await?;
         let token: MetadataValue<_> = format!("Bearer {}", self.token).parse()?;
 
         let max_message_size = self
