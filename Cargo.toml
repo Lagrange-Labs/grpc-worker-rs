@@ -10,7 +10,12 @@ async-stream = "^0.3"
 rand = "^0.8.5"
 tokio = "^1.41.0"
 tokio-stream = "^0.1"
-tonic = { version = "^0.12", features = ["transport", "tls", "tls-roots", "tls-webpki-roots"] }
+tonic = { version = "^0.12", features = [
+  "transport",
+  "tls",
+  "tls-roots",
+  "tls-webpki-roots",
+] }
 tracing = "^0.1"
 tonic-build = "^0.12"
 prost = "^0.13"
@@ -31,7 +36,7 @@ redact = "0.1.10"
 k256 = { version = "0.13", default-features = false }
 component = "0.1.1"
 rust-analyzer = "0.0.1"
-rustls = { version = "0.23.20", features = ["ring"] }
+rustls = { version = "^0.23.19", features = ["ring"] }
 
 [build-dependencies]
 miette = { version = "7.2.0", features = ["fancy"] }
