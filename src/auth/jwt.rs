@@ -4,23 +4,25 @@ use std::collections::BTreeMap;
 use std::time::SystemTime;
 use std::time::UNIX_EPOCH;
 
+use alloy::signers::SignerSync;
+use alloy::{
+    primitives::{eip191_hash_message as hash_message, Signature},
+    signers::local::PrivateKeySigner,
+};
 use anyhow::Result;
 use base64::prelude::BASE64_URL_SAFE_NO_PAD;
 use base64::Engine;
 use elliptic_curve::consts::U32;
 use elliptic_curve::sec1::ToEncodedPoint;
-use ethers::prelude::LocalWallet;
-use ethers::prelude::Signature;
-use ethers_core::k256::ecdsa::RecoveryId;
-use ethers_core::k256::ecdsa::Signature as RecoverableSignature;
-use ethers_core::k256::ecdsa::Signature as K256Signature;
-use ethers_core::k256::ecdsa::VerifyingKey;
-use ethers_core::k256::PublicKey;
-use ethers_core::utils::hash_message;
 use generic_array::GenericArray;
 use jwt::Claims;
 use jwt::RegisteredClaims;
 use jwt::ToBase64;
+use k256::ecdsa::RecoveryId;
+use k256::{
+    ecdsa::{Signature as RecoverableSignature, Signature as K256Signature, VerifyingKey},
+    PublicKey,
+};
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -32,14 +34,11 @@ pub struct JWTAuth {
 
 impl JWTAuth {
     /// Create a new instance and sign with the wallet.
-    pub fn new(claims: Claims, wallet: &LocalWallet) -> Result<Self> {
+    pub fn new(claims: Claims, wallet: &PrivateKeySigner) -> Result<Self> {
         let msg = claims.to_base64()?;
 
-        // `sign_message` is an async function:
-        // <https://github.com/gakonst/ethers-rs/blob/master/ethers-signers/src/wallet/mod.rs#L85>
-        // Seems not make sense, so copy the code here.
         let message_hash = hash_message(msg.as_bytes());
-        let signature = wallet.sign_hash(message_hash)?;
+        let signature = wallet.sign_hash_sync(&message_hash)?;
 
         Ok(Self { claims, signature })
     }
@@ -96,12 +95,10 @@ impl JWTAuth {
     /// Copied from ethers-rs since it's private:
     /// <https://github.com/gakonst/ethers-rs/blob/master/ethers-core/src/types/signature.rs#L129>
     fn as_signature(&self) -> Result<(RecoverableSignature, RecoveryId)> {
-        let mut recovery_id = self.signature.recovery_id()?;
+        let mut recovery_id = self.signature.recid();
         let mut signature = {
-            let mut r_bytes = [0u8; 32];
-            let mut s_bytes = [0u8; 32];
-            self.signature.r.to_big_endian(&mut r_bytes);
-            self.signature.s.to_big_endian(&mut s_bytes);
+            let r_bytes: [_; 32] = self.signature.r().to_be_bytes();
+            let s_bytes: [_; 32] = self.signature.s().to_be_bytes();
             let gar: &GenericArray<u8, U32> = GenericArray::from_slice(&r_bytes);
             let gas: &GenericArray<u8, U32> = GenericArray::from_slice(&s_bytes);
             K256Signature::from_scalars(*gar, *gas)?
@@ -124,7 +121,12 @@ impl JWTAuth {
 /// token, and not the GW.
 /// This is due to historical reason where gateway was focused on AVS only workers.
 /// TODO: change that to have the Gateway issuing the JWT token.
-pub fn get_claims(issuer: String, gw_version: String, worker_id: String, class: String) -> anyhow::Result<Claims> {
+pub fn get_claims(
+    issuer: String,
+    gw_version: String,
+    worker_id: String,
+    class: String,
+) -> anyhow::Result<Claims> {
     let registered = RegisteredClaims {
         issuer: Some(issuer),
         subject: Some(worker_id),
@@ -138,10 +140,7 @@ pub fn get_claims(issuer: String, gw_version: String, worker_id: String, class: 
     };
 
     let private = [
-        (
-            "version".to_string(),
-            serde_json::Value::String(gw_version),
-        ),
+        ("version".to_string(), serde_json::Value::String(gw_version)),
         ("worker_class".to_string(), serde_json::Value::String(class)),
     ]
     .into_iter()

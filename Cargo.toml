@@ -25,15 +25,11 @@ serde = "1.0.215"
 serde_json = "1.0.133"
 base64 = "0.22.1"
 elliptic-curve = "0.13.8"
-ethers-core = "2.0.14"
-## TODO: fix by upgrading version and move to alloy
-generic-array = "^0.14"
+generic-array = "0.14.0"
 jwt = "0.16.0"
-ethers = { git = "https://github.com/Lagrange-Labs/ethers-rs", default-features = false, features = [
-  "rustls",
-], branch = "get-proof-0x" }
+alloy = { version = "0.15.10", features = ["k256", "signers", "signer-keystore", "signer-local"] }
+k256 = { version = "0.13.4" }
 redact = "0.1.10"
-k256 = { version = "0.13", default-features = false }
 component = "0.1.1"
 rust-analyzer = "0.0.1"
 rustls = { version = "^0.23.19", features = ["ring"] }
