@@ -33,6 +33,7 @@ redact = "0.1.10"
 component = "0.1.1"
 rust-analyzer = "0.0.1"
 rustls = { version = "^0.23.19", features = ["ring"] }
+serde_with = "3.12.0"
 
 [build-dependencies]
 miette = { version = "7.2.0", features = ["fancy"] }

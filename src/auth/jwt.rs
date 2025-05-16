@@ -25,10 +25,13 @@ use k256::{
 };
 use serde::Deserialize;
 use serde::Serialize;
+use serde_with::{serde_as, DisplayFromStr};
 
+#[serde_as]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct JWTAuth {
     claims: Claims,
+    #[serde_as(as = "DisplayFromStr")]
     signature: Signature,
 }
 
