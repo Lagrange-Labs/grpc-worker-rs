@@ -27,7 +27,7 @@ base64 = "0.22.1"
 elliptic-curve = "0.13.8"
 generic-array = "0.14.0"
 jwt = "0.16.0"
-alloy = { version = "0.15.10", features = ["k256", "signers", "signer-keystore", "signer-local"] }
+alloy = { version = "1.0", features = ["k256", "signers", "signer-keystore", "signer-local"] }
 k256 = { version = "0.13.4" }
 redact = "0.1.10"
 component = "0.1.1"
